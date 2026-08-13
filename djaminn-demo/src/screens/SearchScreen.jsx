@@ -14,7 +14,7 @@ export default function SearchScreen() {
 
   async function handleSearch() {
     const result = await api.get(searchValue);
-    setSearchResults(result.artists || []);
+    setSearchResults(result.results || []);
   }
 
   return (
@@ -23,6 +23,7 @@ export default function SearchScreen() {
         <TextInputComponent
           controlledValue={searchValue}
           onChange={(e) => setSearchValue(e.target.value)}
+          onEnter={handleSearch}
         />
         <ButtonComponent buttonText="Search" onClick={handleSearch} />
       </div>
@@ -30,18 +31,21 @@ export default function SearchScreen() {
       <Container>
         <Row>
           <Col className="bg-primary text-white">
-            <h2>name</h2>
+            <h2>Name</h2>
           </Col>
-          <Col className="bg-secondary text-white">
-            <h2>country</h2>
+          <Col className="bg-primary text-white">
+            <h2>Artist</h2>
+          </Col>
+          <Col className="bg-primary text-white">
+            <h2>Score</h2>
           </Col>
         </Row>
       </Container>
 
-      {searchResults.map((artist) => (
-        <div key={artist.id}>
+      {searchResults.map((item) => (
+        <div key={item.id}>
           <ItemComponent
-            item={{ name: artist.name, country: artist.country }}
+            item={{ name: item.title, artist: item.artist, score: item.similarity_score }}
           />
         </div>
       ))}

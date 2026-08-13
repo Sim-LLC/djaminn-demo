@@ -10,7 +10,10 @@ export default function ItemComponent({ item }) {
           <h4>{item.name}</h4>
         </Col>
         <Col className="bg-secondary text-white">
-          <p>{item.country}</p>
+          <p>{item.artist}</p>
+        </Col>
+        <Col className="bg-secondary text-white">
+          <p>{item.score}</p>
         </Col>
       </Row>
     </Container>
