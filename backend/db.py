@@ -4,7 +4,7 @@ from sqlite_vec import serialize_float32
 from backend.songs_data import SONGS, song_to_passage
 from backend.embedder import embed_song, embed_search
 
-def init_db(db_path="songs.db"):
+def init_db(db_path="backend/songs.db"):
     db = sqlite3.connect(db_path, check_same_thread=False)
     db.enable_load_extension(True)
     sqlite_vec.load(db)
