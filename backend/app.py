@@ -1,10 +1,21 @@
 from fastapi import FastAPI, Query
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from backend.db import init_db, index_songs, search_songs
 
 app = FastAPI(title="Song Semantic Search API")
 db = init_db()
 index_songs(db)
+
+origins = ["*"]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 class SongResult(BaseModel):
     id: int
