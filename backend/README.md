@@ -13,6 +13,7 @@ Hệ thống có khả năng hiểu ý nghĩa của câu truy vấn (tiếng Vi�
 - **SQLite Vector Database**: Tích hợp extension `sqlite-vec` để lưu trữ và truy vấn khoảng cách Cosine (`cosine distance`) trực tiếp trên CSDL SQLite nhẹ và nhanh chóng.
 - **RESTful API**: Cung cấp API tìm kiếm linh hoạt với FastAPI, tự động sinh tài liệu Swagger UI.
 - **Tự động Indexing**: Tự động tạo bảng, trích xuất embedding và đánh chỉ số vector cho bài hát khi server khởi chạy.
+- **Hai chế độ reranking**: Có thể rerank các ứng viên bằng `BAAI/bge-reranker-v2-m3` hoặc `Qwen/Qwen3-Reranker-0.6B`.
 
 ---
 
@@ -23,6 +24,7 @@ backend/
 ├── app.py           # FastAPI Web Application & các API Endpoints
 ├── db.py            # Khởi tạo SQLite DB, lưu trữ và truy vấn vector (sqlite-vec)
 ├── embedder.py      # Xử lý vector embedding sử dụng SentenceTransformer (e5-small)
+├── rerankers.py     # BGE cross-encoder và Qwen3 LLM reranking
 ├── songs_data.py    # Dữ liệu bài hát mẫu và hàm chuẩn hóa định dạng văn bản
 ├── requirements.txt # Thư viện phụ thuộc của dự án
 └── README.md        # Tài liệu hướng dẫn sử dụng Backend
@@ -57,6 +59,7 @@ pip install -r backend/requirements.txt
 
 Các thư viện chính trong `requirements.txt`:
 - `sentence-transformers`: Tạo nhúng vector từ câu văn.
+- `transformers` và `torch`: Chạy hai reranking model.
 - `sqlite-vec`: Extension tìm kiếm vector cho SQLite.
 - `fastapi`: Framework web API hiệu năng cao.
 - `uvicorn`: ASGI Web Server.
@@ -125,6 +128,30 @@ GET http://localhost:8000/search?q=b%C3%A0i%20h%C3%A1t%20v%E1%BB%81%20t%C3%ACnh%
 
 - `distance`: Khoảng cách Cosine giữa vector truy vấn và vector bài hát (giá trị càng nhỏ càng giống nhau).
 - `similarity_score`: Điểm tương đồng quy đổi theo phần trăm (`(1 - distance) * 100`).
+
+### 2. Search + BGE reranking (`GET /search/bge`)
+
+Lấy 20 kết quả từ vector search rồi xếp hạng lại bằng
+`BAAI/bge-reranker-v2-m3`.
+
+```http
+GET http://localhost:8000/search/bge?q=b%C3%A0i%20h%C3%A1t%20v%E1%BB%81%20t%C3%ACnh%20b%E1%BA%A1n&limit=3
+```
+
+### 3. Search + Qwen3 LLM reranking (`GET /search/qwen`)
+
+Endpoint này dùng `Qwen/Qwen3-Reranker-0.6B` để chấm xác suất câu trả lời
+`yes`/`no` cho từng cặp query-document rồi sắp xếp giảm dần theo xác suất
+`yes`.
+
+```http
+GET http://localhost:8000/search/qwen?q=b%C3%A0i%20h%C3%A1t%20bu%E1%BB%93n%20v%E1%BB%81%20t%C3%ACnh%20y%C3%AAu&limit=3
+```
+
+Với hai endpoint reranking, `similarity_score` là điểm do reranker chấm và
+quy đổi sang phần trăm.
+
+Model được tải ở lần gọi endpoint đầu tiên.
 
 ---
 

@@ -701,5 +701,19 @@ SONGS = [
     },
 ]
 
-def song_to_passage(song: dict) -> str:
-    return f"Bài hát: {song['title']}. Nghệ sĩ: {song['artist']}. Thể loại: {song['genre']}. {song['description']}"
+def song_to_passage(song: dict | tuple) -> str:
+    if isinstance(song, dict):
+        title = song["title"]
+        artist = song["artist"]
+        genre = song["genre"]
+        description = song["description"]
+    else:
+        title = song[1]
+        artist = song[2]
+        genre = song[3]
+        description = song[5]
+
+    return (
+        f"Bài hát: {title}. Nghệ sĩ: {artist}. "
+        f"Thể loại: {genre}. {description}"
+    )

@@ -27,7 +27,7 @@ def index_songs(db):
 def search_songs(db, query_text: str, top_k: int = 3):
     query_vec = embed_search(query_text)
     sql = """
-        SELECT s.id, s.title, s.artist, s.genre, v.distance
+        SELECT s.id, s.title, s.artist, s.genre, v.distance, s.description
         FROM song_vec v
         JOIN songs s ON s.id = v.song_id
         WHERE v.embedding MATCH ? AND k = ?
